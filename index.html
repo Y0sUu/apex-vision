@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>APEX Vision — Dans la peau du pilote</title>
+  <meta name="description" content="APEX Vision : l'expérience en réalité augmentée du Grand Prix de France pour vivre un virage comme un pilote MotoGP.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --hud: #d4ff3a; --ink: #0b0d10; --panel: #151a20; --muted: #9aa4ad; --line: rgba(212,255,58,.25); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; background: var(--ink); color: #eef2f5;
+      font-family: "Rajdhani", "Arial Narrow", system-ui, sans-serif; font-size: 18px; line-height: 1.4;
+    }
+    main { max-width: 520px; margin: 0 auto; padding: max(28px, env(safe-area-inset-top)) 16px 40px; }
+    .brand { color: var(--hud); font-weight: 700; letter-spacing: .32em; font-size: 13px; }
+    .event { color: var(--muted); font-weight: 600; letter-spacing: .12em; font-size: 13px; text-transform: uppercase; margin-top: 4px; }
+
+    .visor {
+      position: relative; margin: 26px 0 22px; aspect-ratio: 16 / 9; border-radius: 48% 48% 18% 18% / 60% 60% 22% 22%;
+      background:
+        radial-gradient(ellipse at 50% 120%, rgba(212,255,58,.18), transparent 60%),
+        linear-gradient(160deg, #1d2a36, #0b0d10 70%);
+      border: 1px solid var(--line); overflow: hidden;
+      display: grid; place-items: center;
+    }
+    .visor .big { color: var(--hud); font-size: 62px; font-weight: 700; line-height: 1; text-shadow: 0 0 18px rgba(212,255,58,.5); }
+    .visor .big small { font-size: 22px; }
+    .visor .cap { color: var(--hud); opacity: .75; letter-spacing: .25em; font-size: 11px; text-align: center; margin-bottom: 6px; }
+    .visor .scan {
+      position: absolute; left: 0; right: 0; height: 2px; background: var(--hud); opacity: .5;
+      box-shadow: 0 0 12px var(--hud); animation: scan 2.6s ease-in-out infinite;
+    }
+    @keyframes scan { 0%,100% { top: 18%; } 50% { top: 82%; } }
+
+    h1 { font-size: 40px; line-height: 1; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .01em; }
+    h1 span { color: var(--hud); }
+    p.lead { color: #c9d1d8; margin: 0 0 22px; }
+
+    .steps { list-style: none; padding: 0; margin: 0 0 26px; display: grid; gap: 10px; }
+    .steps li { display: flex; gap: 14px; align-items: flex-start; background: var(--panel); border-radius: 12px; padding: 12px 14px; }
+    .steps b { color: var(--hud); font-size: 26px; line-height: 1; min-width: 22px; }
+    .steps strong { display: block; font-size: 17px; }
+    .steps span { color: var(--muted); font-size: 15px; }
+
+    .btn {
+      display: block; width: 100%; text-align: center; text-decoration: none; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase; padding: 16px; border-radius: 12px; font-size: 17px;
+    }
+    .btn.primary { background: var(--hud); color: var(--ink); box-shadow: 0 0 24px rgba(212,255,58,.35); }
+    .btn.ghost { color: var(--hud); border: 1px solid var(--line); margin-top: 10px; }
+    .note { color: var(--muted); font-size: 14px; margin-top: 18px; text-align: center; }
+    .note a { color: var(--hud); }
+    footer { color: #5e6870; font-size: 12px; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="brand">APEX&nbsp;VISION</div>
+    <div class="event">GP de France MotoGP · Le Mans</div>
+
+    <div class="visor" aria-hidden="true">
+      <div class="scan"></div>
+      <div><div class="cap">POINT DE FREINAGE</div><div class="big">150<small>m</small></div></div>
+    </div>
+
+    <h1>Vis le virage <span>comme un pilote</span></h1>
+    <p class="lead">Depuis la tribune, un virage passe en deux secondes. APEX Vision te montre ce que le pilote vit vraiment : la trajectoire au sol, le point de freinage, les vitesses, l'angle d'inclinaison. Ton téléphone devient sa visière.</p>
+
+    <ol class="steps">
+      <li><b>1</b><div><strong>Active la visière</strong><span>Autorise la caméra quand ton téléphone le demande.</span></div></li>
+      <li><b>2</b><div><strong>Vise un virage du stand</strong><span>Pointe la caméra sur un panneau Virage 1, 2 ou 3 de la fan zone.</span></div></li>
+      <li><b>3</b><div><strong>Vis le virage</strong><span>La moto apparaît sur sa trajectoire : freinage, corde, remise des gaz, avec les vrais ordres de grandeur.</span></div></li>
+    </ol>
+
+    <a class="btn primary" href="ar.html">Lancer l'expérience</a>
+    <a class="btn ghost" href="demo.html">Mode démo sans caméra</a>
+
+    <p class="note">Pas de panneau sous la main ? <a href="marqueurs-apex-vision.pdf">Imprime les marqueurs</a>.</p>
+    <footer>Projet étudiant BUT MMI · Marque et données fictives</footer>
+  </main>
+</body>
+</html>

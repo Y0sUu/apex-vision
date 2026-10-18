@@ -1,0 +1,148 @@
+/* APEX Vision — interface de visière (HUD) */
+:root {
+  --hud: #d4ff3a;          /* jaune-vert néon, couleur principale du HUD */
+  --hud-dim: rgba(212, 255, 58, 0.35);
+  --alert: #ff3b30;        /* freinage */
+  --ok: #3affc4;           /* accélération */
+  --ink: #0b0d10;
+  --glass: rgba(8, 12, 16, 0.55);
+  --font: "Rajdhani", "Arial Narrow", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+/* ---------- Visière ---------- */
+.visor {
+  position: fixed; inset: 0; z-index: 10;
+  pointer-events: none;
+  font-family: var(--font);
+  color: var(--hud);
+  text-shadow: 0 0 8px rgba(212, 255, 58, 0.55);
+}
+/* teinte et bords de la visière */
+.visor::before {
+  content: ""; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 55%, transparent 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.92) 100%),
+    linear-gradient(180deg, rgba(20, 30, 40, 0.35), rgba(0,0,0,0) 30%);
+}
+.visor-frame {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+}
+.visor-frame path { fill: none; stroke: var(--hud-dim); stroke-width: 1.5; }
+
+/* ---------- Bandeau du haut ---------- */
+.hud-top {
+  position: absolute; top: max(14px, env(safe-area-inset-top)); left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.brand { font-weight: 700; letter-spacing: 0.32em; font-size: 12px; opacity: 0.85; }
+.status {
+  margin-top: 6px; padding: 5px 12px; border: 1px solid var(--hud-dim);
+  border-radius: 999px; background: var(--glass);
+  font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.status.live { border-color: var(--hud); }
+.status .dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--hud-dim); margin-right: 7px; vertical-align: 1px;
+}
+.status.live .dot { background: var(--hud); animation: blink 1s infinite; }
+
+/* ---------- Données (masquées tant qu'aucun virage n'est détecté) ---------- */
+.hud-data { opacity: 0; transition: opacity 0.35s ease; }
+.visor.active .hud-data { opacity: 1; }
+
+.corner-name {
+  position: absolute; top: calc(max(14px, env(safe-area-inset-top)) + 64px); left: 0; right: 0;
+  text-align: center;
+}
+.corner-name .num { font-size: 13px; letter-spacing: 0.25em; opacity: 0.8; }
+.corner-name .label { font-size: 26px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.corner-name .dir { font-size: 15px; font-weight: 600; opacity: 0.9; }
+
+/* distance au point de freinage */
+.brake {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%);
+  text-align: center; min-width: 210px;
+}
+.brake .cap { font-size: 12px; letter-spacing: 0.25em; opacity: 0.8; }
+.brake .val { font-size: 64px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.brake .val small { font-size: 22px; margin-left: 4px; }
+.brake .bar {
+  margin: 8px auto 0; width: 200px; height: 6px; border-radius: 3px;
+  background: var(--hud-dim); overflow: hidden;
+}
+.brake .bar i { display: block; height: 100%; width: 100%; background: var(--hud); transform-origin: left; }
+
+/* message d'action (FREINE / CORDE / GAZ) */
+.action {
+  position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) scale(0.9);
+  font-size: 56px; font-weight: 700; letter-spacing: 0.1em;
+  opacity: 0; transition: opacity 0.15s, transform 0.15s;
+}
+.action.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.action.brake-now { color: var(--alert); text-shadow: 0 0 18px rgba(255, 59, 48, 0.8); animation: blink 0.35s infinite; }
+.action.apex { color: var(--hud); }
+.action.throttle { color: var(--ok); text-shadow: 0 0 14px rgba(58, 255, 196, 0.7); }
+
+.visor.braking::after {
+  content: ""; position: absolute; inset: 0;
+  box-shadow: inset 0 0 80px 10px rgba(255, 59, 48, 0.55);
+}
+
+/* chiffre clé pour le spectateur */
+.fact {
+  position: absolute; left: 50%; top: calc(max(14px, env(safe-area-inset-top)) + 160px); transform: translate(-50%, 6px);
+  width: min(88vw, 420px); text-align: center; padding: 10px 14px;
+  background: var(--glass); border-radius: 12px; border: 1px solid var(--hud-dim);
+  opacity: 0; transition: opacity .3s, transform .3s;
+}
+.fact.show { opacity: 1; transform: translate(-50%, 0); }
+.fact .big { font-size: 22px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fact .small { font-size: 14px; font-weight: 500; color: #e9eef2; text-shadow: none; margin-top: 2px; }
+.fact.f-brake { border-color: var(--alert); }
+.fact.f-brake .big { color: #ff6b61; text-shadow: 0 0 10px rgba(255,59,48,.6); }
+.fact.f-exit { border-color: var(--ok); }
+.fact.f-exit .big { color: var(--ok); }
+
+/* jauges latérales */
+.gauge {
+  position: absolute; bottom: calc(max(16px, env(safe-area-inset-bottom)) + 52px);
+  padding: 8px 12px; border-left: 2px solid var(--hud); background: var(--glass);
+  min-width: 82px;
+}
+.gauge.left { left: 12px; }
+.gauge.right { right: 12px; border-left: 0; border-right: 2px solid var(--hud); text-align: right; }
+.gauge .cap { font-size: 11px; letter-spacing: 0.2em; opacity: 0.8; }
+.gauge .val { font-size: 34px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.gauge .unit { font-size: 13px; opacity: 0.8; }
+
+/* angle d'inclinaison */
+.lean {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 44px);
+  width: 160px; text-align: center;
+}
+.lean svg { width: 160px; height: 92px; overflow: visible; display: block; }
+.lean .arc { fill: none; stroke: var(--hud-dim); stroke-width: 5; }
+.lean .target { stroke: var(--alert); stroke-width: 4; }
+.lean .needle { stroke: var(--hud); stroke-width: 7; stroke-linecap: round; }
+.lean .num { fill: var(--hud); font: 700 30px var(--font); }
+.lean .cap { font-size: 11px; letter-spacing: 0.18em; opacity: 0.8; margin-top: 4px; }
+
+/* bas d'écran */
+.hud-bottom {
+  position: absolute; left: 16px; right: 16px; bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; justify-content: space-between; align-items: flex-end;
+  font-size: 14px; font-weight: 600; letter-spacing: 0.06em;
+}
+.hud-bottom b { font-size: 20px; font-variant-numeric: tabular-nums; }
+
+@keyframes blink { 50% { opacity: 0.35; } }
+
+@media (min-width: 700px) {
+  .brake .val { font-size: 84px; }
+  .gauge.left { left: 6vw; } .gauge.right { right: 6vw; }
+  .hud-bottom { left: 6vw; right: 6vw; }
+}

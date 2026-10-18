@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>APEX Vision — Démo spectateur</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/hud.css">
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; background: #0b0d10; }
+    .scene { position: fixed; inset: 0; transition: transform .4s ease; }
+    .scene.left { transform: scaleX(-1); }
+    .scene svg { width: 100%; height: 100%; display: block; }
+    .seg { opacity: .35; transition: opacity .25s; }
+    html[data-phase="approach"] .seg-approach, html[data-phase="brake"] .seg-brake,
+    html[data-phase="apex"] .seg-apex, html[data-phase="exit"] .seg-exit { opacity: 1; }
+    html[data-phase="brake"] .seg-brake { animation: pulse .35s infinite alternate; }
+    @keyframes pulse { to { opacity: .45; } }
+    .apex-dot { animation: pulse .6s infinite alternate; }
+    .scene.left text { transform-box: fill-box; transform-origin: center; transform: scaleX(-1); }
+    .controls {
+      position: fixed; z-index: 20; right: 12px;
+      top: calc(max(12px, env(safe-area-inset-top)) + 40px);
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .controls button, .back {
+      font: 600 14px "Rajdhani", sans-serif; letter-spacing: .08em; color: #d4ff3a;
+      background: rgba(8,12,16,.7); border: 1px solid rgba(212,255,58,.4); border-radius: 8px;
+      padding: 8px 12px; cursor: pointer; text-decoration: none;
+    }
+    .controls button[aria-pressed="true"] { background: #d4ff3a; color: #0b0d10; }
+    .back { position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 12px; font-size: 13px; padding: 6px 10px; }
+    .tag {
+      position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); right: 12px;
+      font: 600 12px "Rajdhani", sans-serif; letter-spacing: .15em; color: #0b0d10; background: #d4ff3a;
+      padding: 5px 8px; border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Décor : vue pilote à l'approche d'un virage -->
+  <div class="scene" id="scene">
+    <svg viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#4a6b8a"/><stop offset="1" stop-color="#a9c2d6"/>
+        </linearGradient>
+        <linearGradient id="grass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3d6a32"/><stop offset="1" stop-color="#1f3a19"/>
+        </linearGradient>
+      </defs>
+      <rect width="400" height="330" fill="url(#sky)"/>
+      <path d="M0 300 Q120 270 220 292 T400 285 V340 H0Z" fill="#5d7a8c" opacity=".7"/>
+      <rect y="320" width="400" height="380" fill="url(#grass)"/>
+      <!-- tribune -->
+      <rect x="250" y="268" width="140" height="40" fill="#1d2630"/>
+      <rect x="250" y="262" width="140" height="8" fill="#c0392b"/>
+      <!-- piste -->
+      <path d="M-40 700 C 120 520, 170 420, 230 360 S 360 322, 420 326 L 420 342 C 360 340, 270 360, 250 380 C 210 430, 230 560, 330 700 Z" fill="#2b2f36"/>
+      <!-- vibreurs -->
+      <path d="M232 360 C 245 352, 300 336, 420 330" stroke="#fff" stroke-width="6" stroke-dasharray="10 10" fill="none"/>
+      <path d="M232 360 C 245 352, 300 336, 420 330" stroke="#d62d20" stroke-width="6" stroke-dasharray="10 10" stroke-dashoffset="10" fill="none"/>
+      <!-- trajectoire peinte au sol : vert = pleine charge, rouge = freinage, jaune = corde -->
+      <g fill="none" stroke-linecap="round">
+        <path class="seg seg-approach" d="M140 700 C 165 620, 185 560, 200 520" stroke="#3affc4" stroke-width="12"/>
+        <path class="seg seg-brake" d="M200 520 C 212 480, 222 420, 240 395" stroke="#ff3b30" stroke-width="10"/>
+        <path class="seg seg-apex" d="M240 395 C 255 375, 280 350, 330 340" stroke="#d4ff3a" stroke-width="7"/>
+        <path class="seg seg-exit" d="M330 340 C 370 335, 400 334, 420 334" stroke="#3affc4" stroke-width="5"/>
+      </g>
+      <line x1="170" y1="522" x2="232" y2="518" stroke="#fff" stroke-width="4"/>
+      <circle class="apex-dot" cx="262" cy="368" r="7" fill="#d4ff3a"/>
+      <!-- panneaux de distance -->
+      <g font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">
+        <rect x="58" y="482" width="36" height="24" fill="#ff3b30"/><line x1="76" y1="506" x2="76" y2="530" stroke="#888" stroke-width="3"/>
+        <text x="76" y="499" font-size="15" fill="#fff" id="board1">150</text>
+        <rect x="112" y="430" width="28" height="19" fill="#fff"/><line x1="126" y1="449" x2="126" y2="468" stroke="#888" stroke-width="2"/>
+        <text x="126" y="444" font-size="12" fill="#000">100</text>
+        <rect x="150" y="394" width="22" height="15" fill="#fff"/><line x1="161" y1="409" x2="161" y2="424" stroke="#888" stroke-width="2"/>
+        <text x="161" y="406" font-size="10" fill="#000">50</text>
+      </g>
+      <!-- carénage de la moto (bas d'écran) -->
+      <path d="M60 700 C 90 600, 150 575, 200 572 C 250 575, 310 600, 340 700 Z" fill="#14181d"/>
+      <path d="M120 700 C 135 640, 165 615, 200 612 C 235 615, 265 640, 280 700 Z" fill="#1f252c"/>
+      <rect x="168" y="628" width="64" height="26" rx="5" fill="#0b0d10" stroke="#d4ff3a" stroke-opacity=".5"/>
+    </svg>
+  </div>
+
+  <a class="back" href="index.html">‹ Retour</a>
+  <div class="tag">MODE DÉMO</div>
+  <div class="controls" role="group" aria-label="Choix du virage">
+    <button data-c="v1" aria-pressed="true">V1</button>
+    <button data-c="v2" aria-pressed="false">V2</button>
+    <button data-c="v3" aria-pressed="false">V3</button>
+  </div>
+
+  <script src="js/hud.js"></script>
+  <script>
+    var hud = ApexHUD.mount(document.body);
+    var scene = document.getElementById("scene");
+    function pick(id) {
+      document.querySelectorAll(".controls button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.c === id));
+      });
+      scene.classList.toggle("left", ApexHUD.corners[id].dir < 0);
+      document.getElementById("board1").textContent = ApexHUD.corners[id].brakeAt;
+      hud.hide(); hud.show(id);
+    }
+    document.querySelectorAll(".controls button").forEach(function (b) {
+      b.addEventListener("click", function () { pick(b.dataset.c); });
+    });
+    pick("v1");
+  </script>
+</body>
+</html>
