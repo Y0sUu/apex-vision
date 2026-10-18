@@ -6,14 +6,14 @@
 (function () {
   "use strict";
 
-  // Virages du Grand Prix de France MotoGP (circuit Bugatti, Le Mans) — valeurs indicatives
+  // Trois virages types de MotoGP (prototype)
   var CORNERS = {
     // V1 et V2 : estimations cohérentes avec les données Brembo du tour (virages 1 à 5 : freinages de 3 s max ;
     //            virages 6 à 9 : freinages de 3,3 à 4,9 s).
     // V3 : chiffres officiels Brembo pour Garage Vert (GP de France 2026) : 263 → 78 km/h, 209 m, 4,9 s, 1,5 g.
-    v1: { num: "VIRAGE 1", label: "Chicane Dunlop", dir: 1,  angle: 90, vmax: 270, vapex: 120, gear: 3, lean: 54, brakeAt: 155, source: "estimation" },
-    v2: { num: "VIRAGE 2", label: "Le Musée",       dir: -1, angle: 75, vmax: 248, vapex: 84,  gear: 2, lean: 58, brakeAt: 160, source: "estimation" },
-    v3: { num: "VIRAGE 3", label: "Garage Vert",    dir: 1,  angle: 85, vmax: 263, vapex: 78,  gear: 2, lean: 61, brakeAt: 209, time: 4.9, g: 1.5, source: "Brembo" }
+    v1: { num: "VIRAGE 1", label: "Chicane rapide", dir: 1,  angle: 90, vmax: 270, vapex: 120, gear: 3, lean: 54, brakeAt: 155, source: "estimation" },
+    v2: { num: "VIRAGE 2", label: "Épingle gauche", dir: -1, angle: 75, vmax: 248, vapex: 84,  gear: 2, lean: 58, brakeAt: 160, source: "estimation" },
+    v3: { num: "VIRAGE 3", label: "Gros freinage",  dir: 1,  angle: 85, vmax: 263, vapex: 78,  gear: 2, lean: 61, brakeAt: 209, time: 4.9, g: 1.5, source: "Brembo" }
   };
 
   // Durée des phases (ms)
@@ -70,7 +70,7 @@
     '    <line class="needle" data-el="needle" x1="80" y1="8" x2="80" y2="24"/>' +
     '    <text class="num" x="80" y="80" text-anchor="middle"><tspan data-el="leanVal">0</tspan>°</text></svg>' +
     '    <div class="cap">ANGLE · CIBLE <span data-el="leanTarget">0</span>°</div></div>' +
-    '  <div class="hud-bottom"><div><b>LE MANS</b></div><div><b data-el="chrono">0:00.000</b></div><div>TOUR <b>12</b>/27</div></div>' +
+    '  <div class="hud-bottom"><div><b>MOTOGP</b></div><div><b data-el="chrono">0:00.000</b></div><div>TOUR <b>12</b>/27</div></div>' +
     '</div>';
 
   function lerp(a, b, k) { return a + (b - a) * k; }
