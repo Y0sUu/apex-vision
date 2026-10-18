@@ -34,6 +34,7 @@
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
   <script src="js/hud.js"></script>
+  <script src="js/models.js"></script>
   <script src="js/corner3d.js"></script>
 </head>
 <body>
@@ -55,7 +56,10 @@
     </a-marker>
     <!-- Marqueur de secours (Hiro) : déclenche le virage 1 -->
     <a-marker id="m-hiro" type="pattern" url="markers/patt.hiro" data-corner="v1" emitevents="true" smooth="true" smoothCount="5">
-      <a-entity corner-model="corner: v1" scale="0.6 0.6 0.6"></a-entity>
+      <a-entity class="hiro-corner" corner-model="corner: v1" scale="0.6 0.6 0.6"></a-entity>
+      <!-- plan du circuit (affiché seulement si models/piste.glb existe) -->
+      <a-entity class="hiro-circuit" visible="false"
+                animation="property: rotation; from: 0 0 0; to: 0 360 0; dur: 40000; loop: true; easing: linear"></a-entity>
     </a-marker>
 
     <a-entity light="type: ambient; intensity: 0.9"></a-entity>
@@ -71,6 +75,7 @@
     document.querySelectorAll("a-marker").forEach(function (m) {
       m.addEventListener("markerFound", function () {
         clearTimeout(lostTimer);
+        if (m.dataset.mode === "circuit") { hud.hide(); hud.status(ApexModels.config.piste.label || "Plan du circuit", true); return; }
         visible[m.id] = true;
         hud.show(m.dataset.corner);
       });
@@ -84,6 +89,17 @@
           else hud.hide();
         }, 900);
       });
+    });
+
+    // Modèle du circuit sur le marqueur Hiro (si models/piste.glb est présent)
+    ApexModels.ready.then(function (has) {
+      if (!has.piste) return;
+      var hm = document.getElementById("m-hiro"), p = ApexModels.config.piste;
+      hm.dataset.mode = "circuit";
+      hm.querySelector(".hiro-corner").remove();
+      var c = hm.querySelector(".hiro-circuit");
+      c.innerHTML = '<a-entity gltf-model="url(' + p.src + ')" fit-model="size: ' + p.size + '; yaw: ' + p.yaw + '"></a-entity>';
+      c.setAttribute("visible", true);
     });
 
     // Retire l'écran de chargement quand la caméra tourne

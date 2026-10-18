@@ -1,0 +1,5 @@
+Dépose ici les modèles 3D au format .glb :
+  moto.glb   -> remplace la moto simplifiée sur les panneaux Virage 1, 2, 3
+  piste.glb  -> plan du circuit en 3D sur le marqueur Hiro
+Sans fichier, la version simplifiée est utilisée.
+Pense à créditer les auteurs Sketchfab (licence CC-BY) dans ta présentation.

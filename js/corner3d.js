@@ -81,6 +81,14 @@
       this.segs = this.el.querySelectorAll(".seg");
       this.lbls = this.el.querySelectorAll(".lbl");
       this.last = "";
+
+      // Remplace la moto simplifiée par le modèle Sketchfab s'il est présent
+      var roll = this.roll;
+      if (window.ApexModels) ApexModels.ready.then(function (has) {
+        if (!has.moto) return;
+        var m = ApexModels.config.moto;
+        roll.innerHTML = '<a-entity gltf-model="url(' + m.src + ')" fit-model="size: ' + m.size + '; yaw: ' + m.yaw + '"></a-entity>';
+      });
     },
 
     tick: function () {

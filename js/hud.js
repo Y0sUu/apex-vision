@@ -178,6 +178,11 @@
     setTimeout(tickChrono, 47);
   }
 
-  var api = { mount: mount, show: show, hide: hide, corners: CORNERS, state: state, stats: stats };
+  function status(text, live) {
+    els.statusText.textContent = text;
+    els.status.classList.toggle("live", !!live);
+  }
+
+  var api = { mount: mount, show: show, hide: hide, status: status, corners: CORNERS, state: state, stats: stats };
   window.ApexHUD = api;
 })();
