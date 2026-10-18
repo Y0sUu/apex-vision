@@ -8,9 +8,12 @@
 
   // Virages du Grand Prix de France MotoGP (circuit Bugatti, Le Mans) — valeurs indicatives
   var CORNERS = {
-    v1: { num: "VIRAGE 1", label: "Chicane Dunlop", dir: 1,  angle: 90, vmax: 296, vapex: 98,  gear: 2, lean: 54, brakeAt: 210 },
-    v2: { num: "VIRAGE 2", label: "Le Musée",       dir: -1, angle: 75, vmax: 248, vapex: 84,  gear: 2, lean: 58, brakeAt: 150 },
-    v3: { num: "VIRAGE 3", label: "Garage Vert",    dir: 1,  angle: 85, vmax: 262, vapex: 112, gear: 3, lean: 61, brakeAt: 165 }
+    // V1 et V2 : estimations cohérentes avec les données Brembo du tour (virages 1 à 5 : freinages de 3 s max ;
+    //            virages 6 à 9 : freinages de 3,3 à 4,9 s).
+    // V3 : chiffres officiels Brembo pour Garage Vert (GP de France 2026) : 263 → 78 km/h, 209 m, 4,9 s, 1,5 g.
+    v1: { num: "VIRAGE 1", label: "Chicane Dunlop", dir: 1,  angle: 90, vmax: 270, vapex: 120, gear: 3, lean: 54, brakeAt: 155, source: "estimation" },
+    v2: { num: "VIRAGE 2", label: "Le Musée",       dir: -1, angle: 75, vmax: 248, vapex: 84,  gear: 2, lean: 58, brakeAt: 160, source: "estimation" },
+    v3: { num: "VIRAGE 3", label: "Garage Vert",    dir: 1,  angle: 85, vmax: 263, vapex: 78,  gear: 2, lean: 61, brakeAt: 209, time: 4.9, g: 1.5, source: "Brembo" }
   };
 
   // Durée des phases (ms)
@@ -23,15 +26,16 @@
   // Chiffres « spectateur » dérivés des données du virage
   function stats(c) {
     var v1 = c.vmax / 3.6, v2 = c.vapex / 3.6;
-    var g = (v1 * v1 - v2 * v2) / (2 * c.brakeAt * 9.81);       // décélération moyenne en G
-    var time = (v1 - v2) / (g * 9.81);                           // durée du freinage en s
+    // valeurs officielles si disponibles, sinon calcul physique à partir des vitesses et de la distance
+    var g = c.g || (v1 * v1 - v2 * v2) / (2 * c.brakeAt * 9.81);   // décélération en G
+    var time = c.time || (v1 - v2) / (g * 9.81);                     // durée du freinage en s
     return { g: g.toFixed(1).replace(".", ","), time: time.toFixed(1).replace(".", ","), mps: Math.round(v1) };
   }
   function facts(c) {
     var s = stats(c);
     return {
       approach: [c.vmax + " km/h", "Le pilote parcourt " + s.mps + " mètres chaque seconde"],
-      brake:    [c.vmax + " → " + c.vapex + " km/h en " + s.time + " s", "Freinage à " + s.g + " G sur " + c.brakeAt + " m : son corps est projeté vers l'avant"],
+      brake:    [c.vmax + " → " + c.vapex + " km/h en " + s.time + " s", "Freinage à " + s.g + " G sur " + c.brakeAt + " m" + (c.source === "Brembo" ? " (données Brembo)" : " (estimation)")],
       apex:     ["Inclinée à " + c.lean + "°", "Le genou et le coude frôlent le bitume, à " + c.vapex + " km/h"],
       exit:     ["Remise des gaz", "Progressive, pour ne pas faire glisser le pneu arrière"]
     };
