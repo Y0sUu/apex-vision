@@ -2,13 +2,24 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>APEX Vision — Dans la peau du pilote</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/hud.css">
   <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+    /* fond transparent : la vidéo de la caméra est placée DERRIÈRE la page par AR.js */
+    html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+    body { position: fixed; inset: 0; }
+    /* empêche la vidéo (plus large que l'écran) d'élargir la page et de dézoomer le téléphone */
+    video { position: fixed !important; }
+    a-scene, .a-canvas { position: fixed !important; top: 0; left: 0; }
+    /* en RA : infos centrales plus compactes et plus basses pour laisser voir la maquette 3D */
+    .brake, .action { top: 72%; }
+    .brake .val { font-size: 46px; }
+    .brake .bar { width: 150px; }
+    .action { font-size: 40px; }
+    .visor::before { background: radial-gradient(ellipse 130% 95% at 50% 55%, transparent 65%, rgba(0,0,0,.45) 90%, rgba(0,0,0,.7) 100%); }
     .back {
       position: fixed; z-index: 20; top: max(12px, env(safe-area-inset-top)); left: 12px;
       font: 600 13px "Rajdhani", sans-serif; color: #d4ff3a; text-decoration: none;
@@ -31,20 +42,20 @@
 
   <a-scene embedded vr-mode-ui="enabled: false" loading-screen="enabled: false"
            renderer="logarithmicDepthBuffer: true; precision: medium; alpha: true"
-           arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; patternRatio: 0.50">
+           arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; patternRatio: 0.50; cameraParametersUrl: markers/camera_para.dat; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960">
 
     <a-marker id="m-v1" type="pattern" url="markers/virage1.patt" data-corner="v1" emitevents="true" smooth="true" smoothCount="5">
-      <a-entity corner-model="corner: v1"></a-entity>
+      <a-entity corner-model="corner: v1" scale="0.6 0.6 0.6"></a-entity>
     </a-marker>
     <a-marker id="m-v2" type="pattern" url="markers/virage2.patt" data-corner="v2" emitevents="true" smooth="true" smoothCount="5">
-      <a-entity corner-model="corner: v2"></a-entity>
+      <a-entity corner-model="corner: v2" scale="0.6 0.6 0.6"></a-entity>
     </a-marker>
     <a-marker id="m-v3" type="pattern" url="markers/virage3.patt" data-corner="v3" emitevents="true" smooth="true" smoothCount="5">
-      <a-entity corner-model="corner: v3"></a-entity>
+      <a-entity corner-model="corner: v3" scale="0.6 0.6 0.6"></a-entity>
     </a-marker>
     <!-- Marqueur de secours (Hiro) : déclenche le virage 1 -->
-    <a-marker id="m-hiro" preset="hiro" data-corner="v1" emitevents="true" smooth="true" smoothCount="5">
-      <a-entity corner-model="corner: v1"></a-entity>
+    <a-marker id="m-hiro" type="pattern" url="markers/patt.hiro" data-corner="v1" emitevents="true" smooth="true" smoothCount="5">
+      <a-entity corner-model="corner: v1" scale="0.6 0.6 0.6"></a-entity>
     </a-marker>
 
     <a-entity light="type: ambient; intensity: 0.9"></a-entity>
